@@ -21,7 +21,7 @@ set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F411xE.ld)
 
 
 #COMPILER AND LINKER FLAGS
-set(CMAKE_C_FLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -ffunction-sections -fdata-sections")
+set(CMAKE_C_FLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -ffunction-sections -fdata-sections -Wall -Werror")
 set(CMAKE_CXX_FLAGS ${CMAKE_C_FLAGS} -fno-rtti -fno-tree-loop-distribution)
 
 

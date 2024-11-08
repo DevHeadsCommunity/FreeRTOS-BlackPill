@@ -1,4 +1,12 @@
 #include "gpio.h"
+#include "debug.h"
+#include <assert.h>
+void assert_failed(char *file, int line)
+{
+    printk("assert failed: %s at %d\n", file, line);
+}
+
+#define assert_param(expr) ((expr) ? (void)0 : assert_failed(__FILE__, __LINE__))
 
 void GPIO_ClockDisable(GPIO_TypeDef *pGPIOx)
 {
@@ -34,6 +42,24 @@ void GPIO_ClockEnable(GPIO_TypeDef *pGPIOx)
 
 void GPIO_Init(GPIO_TypeDef *pGPIOx, GPIOConfig_t *pConfig)
 {
+    pGPIOx->MODER &= ~(3U << pConfig->Pin * 2);
+    pGPIOx->MODER |= (pConfig->Mode << (pConfig->Pin * 2));
+
+    pGPIOx->OSPEEDR &= ~(3U << pConfig->Pin * 2);
+    pGPIOx->OSPEEDR |= (pConfig->Mode << (pConfig->Pin * 2));
+
+    if (pConfig->Mode == GPIO_MODE_OUTPUT)
+    {
+        pGPIOx->OTYPER &= ~(1U << pConfig->Pin);
+    }
+    else if (pConfig->Mode == GPIO_MODE_INPUT)
+    {
+        pGPIOx->PUPDR &= (3U << (pConfig->Pin * 2));
+    }
+    else if (pConfig->Mode == GPIO_MODE_ALTFN)
+    {
+        // Set Alternate Function number
+    }
 }
 
 void GPIO_WritePort(GPIO_TypeDef *pGPIO, uint32_t Hex)

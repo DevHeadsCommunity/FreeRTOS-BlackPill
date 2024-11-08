@@ -33,16 +33,22 @@ void gpio_init()
 {
     GPIO_ClockEnable(GPIOB);
 
-    GPIOB->MODER = 0;
+    GPIOConfig_t led_one, led_two, led_three;
 
-    GPIOB->MODER |= 1 << (2 * led_one_pin);
-    GPIOB->OTYPER &= ~(1 << led_one_pin);
+    led_one.Pin = led_one_pin;
+    led_one.Mode = GPIO_MODE_OUTPUT;
+    led_one.OType = GPIO_OTYPE_PP;
+    GPIO_Init(GPIOB, &led_one);
 
-    GPIOB->MODER |= 1 << (2 * led_two_pin);
-    GPIOB->OTYPER &= ~(1 << led_two_pin);
+    led_two.Pin = led_two_pin;
+    led_two.Mode = GPIO_MODE_OUTPUT;
+    led_two.OType = GPIO_OTYPE_PP;
+    GPIO_Init(GPIOB, &led_two);
 
-    GPIOB->MODER |= 1 << (2 * led_three_pin);
-    GPIOB->OTYPER &= ~(1 << led_three_pin);
+    led_three.Pin = led_three_pin;
+    led_three.Mode = GPIO_MODE_OUTPUT;
+    led_three.OType = GPIO_OTYPE_PP;
+    GPIO_Init(GPIOB, &led_three);
 }
 
 void blink_led_one_task(void *params)
@@ -52,10 +58,10 @@ void blink_led_one_task(void *params)
     for (;;)
     {
         GPIO_WritePin(GPIOB, led_one_pin, GPIO_PIN_LOW);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(100));
 
         GPIO_WritePin(GPIOB, led_one_pin, GPIO_PIN_HIGH);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
@@ -66,11 +72,11 @@ void blink_led_two_task(void *params)
     for (;;)
     {
         GPIO_WritePin(GPIOB, led_two_pin, GPIO_PIN_LOW);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(500));
 
         GPIO_WritePin(GPIOB, led_two_pin, GPIO_PIN_HIGH);
         printk("led 2 off\n");
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 void blink_led_three_task(void *params)

@@ -1,7 +1,9 @@
 {
     "files.associations": {
         "task.h": "c",
-        "freertos.h": "c"
+        "freertos.h": "c",
+        "*.inc": "c",
+        "cassert": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

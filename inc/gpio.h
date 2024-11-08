@@ -63,6 +63,7 @@ typedef struct
     GPIO_OSpeed OSpeed;
     GPIO_OType OType;
     GPIO_Pupd PUPD;
+    uint32_t AFn;
 } GPIOConfig_t;
 
 void GPIO_ClockEnable(GPIO_TypeDef *pGPIOx);
