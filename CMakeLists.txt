@@ -40,3 +40,13 @@ target_link_options(${PROJECT_NAME} PUBLIC
     -Wl,--print-memory-usage
     -Wl,--gc-sections
 )
+
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -Obinary ${PROJECT_NAME}.elf ${PROJECT_NAME}.bin
+)
+
+add_custom_target(flash 
+    COMMAND st-flash write ${PROJECT_NAME}.bin 0x08000000
+    COMMAND st-flash reset
+)

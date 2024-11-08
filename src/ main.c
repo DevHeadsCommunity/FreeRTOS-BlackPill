@@ -9,6 +9,8 @@
 #include "stm32f411xe.h"
 #include "uart.h"
 #include "debug.h"
+#include "gpio.h"
+
 /*-----------------------------------------------------------*/
 
 const uint8_t led_one_pin = 7;
@@ -29,7 +31,7 @@ void usart_init()
 
 void gpio_init()
 {
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+    GPIO_ClockEnable(GPIOB);
 
     GPIOB->MODER = 0;
 
@@ -49,10 +51,10 @@ void blink_led_one_task(void *params)
 
     for (;;)
     {
-        GPIOB->BSRR |= 1 << (led_one_pin + 16);
+        GPIO_WritePin(GPIOB, led_one_pin, GPIO_PIN_LOW);
         vTaskDelay(pdMS_TO_TICKS(1000));
 
-        GPIOB->BSRR |= 1 << led_one_pin;
+        GPIO_WritePin(GPIOB, led_one_pin, GPIO_PIN_HIGH);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
@@ -63,10 +65,11 @@ void blink_led_two_task(void *params)
 
     for (;;)
     {
-        GPIOB->BSRR |= 1 << (led_two_pin + 16);
+        GPIO_WritePin(GPIOB, led_two_pin, GPIO_PIN_LOW);
         vTaskDelay(pdMS_TO_TICKS(1000));
 
-        GPIOB->BSRR |= 1 << led_two_pin;
+        GPIO_WritePin(GPIOB, led_two_pin, GPIO_PIN_HIGH);
+        printk("led 2 off\n");
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
@@ -76,11 +79,11 @@ void blink_led_three_task(void *params)
 
     for (;;)
     {
-        GPIOB->BSRR |= 1 << (led_three_pin + 16);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        GPIO_WritePin(GPIOB, led_three_pin, GPIO_PIN_LOW);
+        vTaskDelay(pdMS_TO_TICKS(500));
 
-        GPIOB->BSRR |= 1 << led_three_pin;
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        GPIO_WritePin(GPIOB, led_three_pin, GPIO_PIN_HIGH);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 
