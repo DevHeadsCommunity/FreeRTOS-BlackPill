@@ -32,18 +32,28 @@ typedef struct
     uint32_t mode;
     uint32_t parity;
     uint32_t word_len;
-} uart_config_t;
+} UARTConfig_t;
 
-void uart_init(uart_config_t *config);
+void UART_Init(UARTConfig_t *config);
 
-void uart_gpio_init();
+void UART1_GPIO_Init();
+void UART2_GPIO_Init();
+void UART6_GPIO_Init();
 
-void uart_send_char(USART_TypeDef *p_usart, uint8_t ch);
+void UART_SendChar(USART_TypeDef *p_usart, uint8_t ch);
 
-void uart_send_buffer(USART_TypeDef *p_usart, uint8_t *p_buffer, uint8_t len);
+void UART_SendBuffer(USART_TypeDef *p_usart, uint8_t *p_buffer, uint8_t len);
 
-void uart_recv_char();
+void UART_SendBufferIT(USART_TypeDef *p_usart, uint8_t *p_buffer, uint8_t len);
 
-void uart_recv_buffer();
+void UART_SendBufferDMA(USART_TypeDef *p_usart, uint8_t *p_buffer, uint8_t len);
+
+void UART_RecvChar();
+
+void UART_RecvBuffer();
+
+void UART_RecvBufferIT();
+
+void UART_RecvBufferDMA();
 
 #endif

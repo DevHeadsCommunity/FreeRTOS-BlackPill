@@ -45,20 +45,22 @@ void GPIO_Init(GPIO_TypeDef *pGPIOx, GPIOConfig_t *pConfig)
     pGPIOx->MODER &= ~(3U << pConfig->Pin * 2);
     pGPIOx->MODER |= (pConfig->Mode << (pConfig->Pin * 2));
 
-    pGPIOx->OSPEEDR &= ~(3U << pConfig->Pin * 2);
-    pGPIOx->OSPEEDR |= (pConfig->Mode << (pConfig->Pin * 2));
-
-    if (pConfig->Mode == GPIO_MODE_OUTPUT)
+    if (pConfig->Mode != GPIO_MODE_INPUT)
     {
         pGPIOx->OTYPER &= ~(1U << pConfig->Pin);
+        pGPIOx->OTYPER |= (pConfig->OType << pConfig->Pin);
     }
-    else if (pConfig->Mode == GPIO_MODE_INPUT)
+    if (pConfig->Mode != GPIO_MODE_OUTPUT)
     {
         pGPIOx->PUPDR &= (3U << (pConfig->Pin * 2));
     }
-    else if (pConfig->Mode == GPIO_MODE_ALTFN)
+
+    pGPIOx->OSPEEDR &= ~(3U << pConfig->Pin * 2);
+    pGPIOx->OSPEEDR |= (pConfig->OSpeed << (pConfig->Pin * 2));
+
+    if (pConfig->Mode == GPIO_MODE_ALTFN)
     {
-        // Set Alternate Function number
+        pGPIOx->AFR[(uint32_t)(pConfig->Pin / 8)] |= pConfig->AFn << ((pConfig->Pin % 8) * 4U);
     }
 }
 

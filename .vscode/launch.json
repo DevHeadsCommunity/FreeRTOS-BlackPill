@@ -15,7 +15,7 @@
                 "interface/stlink.cfg",
                 "target/stm32f4x.cfg"
             ],
-            "svdFile": "./debug.svd",
+            "svdFile": "./STM32F411xE.svd",
             "runToEntryPoint": "main",
             // "breakAfterReset": true,
             "armToolchainPath": "/usr/bin",

@@ -1,8 +1,9 @@
 #include "uart.h"
+#include "gpio.h"
 
 extern uint32_t SystemCoreClock;
 
-static inline void uart_clock_enable(USART_TypeDef *p_usart)
+static inline void UART_ClockEnable(USART_TypeDef *p_usart)
 {
     if (p_usart == USART1)
     {
@@ -18,17 +19,17 @@ static inline void uart_clock_enable(USART_TypeDef *p_usart)
     }
 }
 
-static inline void uart_enable(USART_TypeDef *p_usart)
+static inline void UART_Enable(USART_TypeDef *p_usart)
 {
     p_usart->CR1 |= USART_CR1_UE;
 }
 
-static inline void uart_disable(USART_TypeDef *p_usart)
+static inline void UART_Disable(USART_TypeDef *p_usart)
 {
     p_usart->CR1 &= ~USART_CR1_UE;
 }
 
-static inline void uart_mode_config(USART_TypeDef *p_usart, uart_mode mode)
+static inline void UART_ModeConfig(USART_TypeDef *p_usart, uart_mode mode)
 {
     if (mode == BOTH)
     {
@@ -46,13 +47,13 @@ static inline void uart_mode_config(USART_TypeDef *p_usart, uart_mode mode)
     }
 }
 
-static inline void uart_baudrate_config(USART_TypeDef *p_usart, uint32_t br)
+static inline void UART_BaudRateConfig(USART_TypeDef *p_usart, uint32_t br)
 {
     uint32_t usart_div = SystemCoreClock / br;
     p_usart->BRR |= ((usart_div / 16U) << USART_BRR_DIV_Mantissa_Pos) | ((usart_div / 16U) << USART_BRR_DIV_Fraction_Pos);
 }
 
-static inline void uart_parity_config(USART_TypeDef *p_usart, uart_parity parity)
+static inline void UART_ParityConfig(USART_TypeDef *p_usart, uart_parity parity)
 {
     if (parity == NO_PARITY)
     {
@@ -69,7 +70,7 @@ static inline void uart_parity_config(USART_TypeDef *p_usart, uart_parity parity
     }
 }
 
-static inline void uart_word_len_config(USART_TypeDef *p_usart, uart_word_len w_len)
+static inline void UART_WordLenConfig(USART_TypeDef *p_usart, uart_word_len w_len)
 {
     if (w_len == W8_BTIS)
     {
@@ -81,52 +82,62 @@ static inline void uart_word_len_config(USART_TypeDef *p_usart, uart_word_len w_
     }
 }
 
-static inline void uart_ready_sent(USART_TypeDef *p_usart)
+static inline void UART_ReadyToSend(USART_TypeDef *p_usart)
 {
     while (!(p_usart->SR & USART_SR_TXE))
         ;
 }
 
-void uart_gpio_init()
+void UART2_GPIO_Init()
 {
-    // Enabling Clock for GPIOA
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+    GPIOConfig_t Tx, Rx;
+    Tx.Pin = 2;
+    Tx.Mode = GPIO_MODE_ALTFN;
+    Tx.OSpeed = GPIO_OSPEED_HIGH;
+    Tx.OType = GPIO_OTYPE_OD;
+    Tx.PUPD = GPIO_PUPD_PULLUP;
+    Tx.AFn = 7U;
 
-    // Configuring RX and TX Pin
-    GPIOA->MODER |= GPIO_MODER_MODE2_1 | GPIO_MODER_MODE3_1;
-    GPIOA->OTYPER |= GPIO_OTYPER_OT2 | GPIO_OTYPER_OT3;
-    GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR2 | GPIO_OSPEEDER_OSPEEDR3;
-    GPIOA->AFR[0] |= 7 << GPIO_AFRL_AFSEL2_Pos | 7 << GPIO_AFRL_AFSEL3_Pos;
+    Rx.Pin = 3;
+    Rx.Mode = GPIO_MODE_ALTFN;
+    Rx.OSpeed = GPIO_OSPEED_HIGH;
+    Rx.OType = GPIO_OTYPE_OD;
+    Rx.PUPD = GPIO_PUPD_PULLUP;
+    Rx.AFn = 7U;
+
+    GPIO_ClockEnable(GPIOA);
+    GPIO_Init(GPIOA, &Tx);
+    GPIO_Init(GPIOA, &Rx);
 }
 
-void uart_init(uart_config_t *config)
+void UART_Init(UARTConfig_t *config)
 {
-    uart_clock_enable(config->p_usart); // Enable The clock for USART so that it can be modified
+    UART_ClockEnable(config->p_usart); // Enable The clock for USART so that it can be modified
 
-    uart_disable(config->p_usart); // Disable the USART peripheral so that it can be configured
+    UART_Disable(config->p_usart); // Disable the USART peripheral so that it can be configured
 
-    uart_mode_config(config->p_usart, config->mode); // Setting Uart mode, ex: TX_ONLY, RX_ONLY, BOTH
+    UART_ModeConfig(config->p_usart, config->mode); // Setting Uart mode, ex: TX_ONLY, RX_ONLY, BOTH
 
-    uart_baudrate_config(config->p_usart, config->baud_rate); // Setting Baud Rate for
+    UART_BaudRateConfig(config->p_usart, config->baud_rate); // Setting Baud Rate for
 
-    uart_parity_config(config->p_usart, config->parity); // Setting the parity for better error handle
+    UART_ParityConfig(config->p_usart, config->parity); // Setting the parity for better error handle
 
-    uart_word_len_config(config->p_usart, config->word_len); // Setting Word Length
+    UART_WordLenConfig(config->p_usart, config->word_len); // Setting Word Length
 
-    uart_enable(config->p_usart); // Enabling Uart Peripheral
+    UART_Enable(config->p_usart); // Enabling Uart Peripheral
 }
 
-void uart_send_char(USART_TypeDef *p_usart, uint8_t ch)
+void UART_SendChar(USART_TypeDef *p_usart, uint8_t ch)
 {
-    uart_ready_sent(p_usart);
+    UART_ReadyToSend(p_usart);
     p_usart->DR = ch;
 }
 
-void uart_send_buffer(USART_TypeDef *p_usart, uint8_t *p_buffer, uint8_t len)
+void UART_SendBuffer(USART_TypeDef *p_usart, uint8_t *p_buffer, uint8_t len)
 {
     while (*p_buffer && len)
     {
-        uart_send_char(p_usart, (uint8_t)(*p_buffer));
+        UART_SendChar(p_usart, (uint8_t)(*p_buffer));
         p_buffer++;
         len--;
     }
