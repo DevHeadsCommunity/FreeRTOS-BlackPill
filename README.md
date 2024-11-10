@@ -1,5 +1,6 @@
 # FreeRTOS-BlackPill
-This Repository is For Those who want's to learn to port FreeRTOS also who wants to Learn to write own Driver 
+
+## It is Tested on STM32F411CEU6
 
 ## Objectives 
   - Showing How to Port FreeRTOS for STM32 MCU's
