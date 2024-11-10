@@ -28,3 +28,5 @@
    now by default All of our ISR's comes with week definition so if there any stonger implementation they will be replaced but when we Treat FreeRTOS as a Library
    Then it is compiled first as a library after that when we compile our project while linking those week symbols are found by linker due to linking order for this reason 
    It doesn't look for Strongly Implemented ISRs inside FreeRTOS. for this reason the ISR's contains nothing when called and a HardFault occurs  
+2. FreeRTOS source comes with so many different implementation based on the compiler and mcu family it is better to keep your specific one and 
+   delete others it will help you to keep the project structure small 
